@@ -1,11 +1,13 @@
 package edu.escuelaing.arem.ASE.app.POJO.reflections;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.escuelaing.arem.ASE.app.POJO.annotations.Component;
 import edu.escuelaing.arem.ASE.app.POJO.annotations.GetMapping;
+import edu.escuelaing.arem.ASE.app.POJO.annotations.RequestMapping;
 
 /**
  * CREAR @Component, @Interface
@@ -23,10 +25,42 @@ public class Reflection {
 
     public Method getMethod(String name){return methods.get(name);}
 
-    
 
+    public void populateMethods() throws Exception{
+        String path = System.getProperty("java.class.path");
+        File dir = new File(path);
+        if ( !dir.isDirectory() || !dir.exists()) {
+            throw new Exception("algo malo paso...");
+        }
+        String nombre = dir.getName() + ".";
+        search(dir, nombre);
+    }
 
-
+    private void search(File dir, String nombre) throws ClassNotFoundException{
+        File[] archvs = dir.listFiles();
+        for(File a: archvs){
+            if(a.isDirectory()){
+                String pnew = "";
+                if(nombre.contains("classes")){
+                    pnew = a.getName() + ".";
+                }else{
+                    pnew = nombre + a.getName() + ".";
+                }
+                search(dir, pnew);
+            }else if(a.getName().endsWith(".class")){
+                String nombClas = nombre + a.getName().replace(".class","");
+                @SuppressWarnings("rawtypes")
+                Class clase = Class.forName(nombClas);
+                Method[] methodos = clase.getDeclaredMethods();
+                for(Method m : methodos){
+                    if(m.isAnnotationPresent(RequestMapping.class)){
+                        String value = m.getAnnotation(RequestMapping.class).value();
+                        methods.put(value, m);
+                    }
+                }
+            }
+        }
+    }
     public static void mains(String[] args) {
 
         //Suponemos que llega algo por el estilo /sadads
