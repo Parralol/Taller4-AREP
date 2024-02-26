@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+
+import edu.escuelaing.arem.ASE.app.POJO.annotations.RequestMapping;
+import edu.escuelaing.arem.ASE.app.POJO.reflections.Reflection;
+import edu.escuelaing.arem.ASE.app.controllers.FileController;
+
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 
@@ -29,6 +34,9 @@ public class HttpServer {
 
     public void start() throws IOException {
         ServerSocket serverSocket = null;
+        FileController fileController = new FileController();
+        Reflection refl = new Reflection();
+
         try {
             serverSocket = new ServerSocket(35000);
         } catch (IOException e) {
@@ -49,6 +57,9 @@ public class HttpServer {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(clientSocket.getInputStream()));
         String inputLine, outputLine;
+
+        
+
         while ((inputLine = in.readLine()) != null) {
             System.out.println("Recibí: " + inputLine);
             if (!in.ready()) {
