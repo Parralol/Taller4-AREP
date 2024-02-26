@@ -51,7 +51,7 @@ public class FileServiceComp implements FileService {
         if (arch.exists())
             res = Files.readAllBytes(Paths.get(path + image));
         else
-            res = Files.readAllBytes(Paths.get(path + "default"));
+            res = Files.readAllBytes(Paths.get(path + "eba"));
         return res;
     }
 
