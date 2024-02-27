@@ -1,14 +1,17 @@
 package edu.escuelaing.arem.ASE.app.servers;
 
 import java.net.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import edu.escuelaing.arem.ASE.app.POJO.annotations.RequestMapping;
 import edu.escuelaing.arem.ASE.app.POJO.reflections.Reflection;
 import edu.escuelaing.arem.ASE.app.controllers.FileController;
+import static edu.escuelaing.arem.ASE.app.Services.HttpMethodComp.getMethod;
+
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -58,14 +61,30 @@ public class HttpServer {
                 new InputStreamReader(clientSocket.getInputStream()));
         String inputLine, outputLine;
 
-        
-
+        boolean firstline= true;
+        String method = "";
+        String query = "";
+        String file = "";
+        String Host = "";
+        List<String> response = new ArrayList<>();
+        List<String> header = new ArrayList<>();
         while ((inputLine = in.readLine()) != null) {
             System.out.println("Recibí: " + inputLine);
+
+            if(firstline){
+                method = inputLine.split("/")[0].split(" ")[0];
+                query = inputLine.split("/")[1].split(" ")[0];
+                file = inputLine.split("/")[1].split("\\?")[0].split(" ")[0];
+                firstline = false;
+
+            }
             if (!in.ready()) {
                 break;
             }
         }
+        String endpoint = file + method;
+        String URL = "http://"+ Host + "/" + query;
+        System.out.println(getMethod(endpoint));
         outputLine = "<!DOCTYPE html>" +
                 "<html>" +
                 "<head>" +
