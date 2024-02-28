@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import edu.escuelaing.arem.ASE.app.Clase.Peticion;
+import edu.escuelaing.arem.ASE.app.Clase.Respuesta;
 import edu.escuelaing.arem.ASE.app.POJO.reflections.Reflection;
 import edu.escuelaing.arem.ASE.app.controllers.FileController;
 import static edu.escuelaing.arem.ASE.app.Services.HttpMethodComp.getMethod;
@@ -15,6 +17,7 @@ import static edu.escuelaing.arem.ASE.app.Services.HttpMethodComp.getMethod;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class HttpServer {
     //private static String key = "&apikey=b5ed8d05";
@@ -31,11 +34,11 @@ public class HttpServer {
         return instance;
     }
 
-    public HttpServer() throws IOException{
+    public HttpServer() throws IOException, IllegalAccessException, InvocationTargetException{
         start();
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException, IllegalAccessException, InvocationTargetException {
         ServerSocket serverSocket = null;
         FileController fileController = new FileController();
         Reflection refl = new Reflection();
@@ -61,13 +64,14 @@ public class HttpServer {
                 new InputStreamReader(clientSocket.getInputStream()));
         String inputLine, outputLine;
 
+        OutputStream outputStream = clientSocket.getOutputStream();
         boolean firstline= true;
         String method = "";
         String query = "";
         String file = "";
         String Host = "";
         List<String> response = new ArrayList<>();
-        List<String> header = new ArrayList<>();
+        String header = "";
         while ((inputLine = in.readLine()) != null) {
             System.out.println("Recibí: " + inputLine);
 
@@ -77,30 +81,67 @@ public class HttpServer {
                 file = inputLine.split("/")[1].split("\\?")[0].split(" ")[0];
                 firstline = false;
 
+            } else if(inputLine.contains("Host")){
+                Host = inputLine.split(" ")[1];
+                System.out.println(Host);
+
             }
             if (!in.ready()) {
                 break;
             }
         }
-        String endpoint = file + method;
-        String URL = "http://"+ Host + "/" + query;
-        System.out.println(getMethod(endpoint));
-        outputLine = "<!DOCTYPE html>" +
-                "<html>" +
-                "<head>" +
-                "<meta charset=\"UTF-8\">" +
-                "<title>Title of the document</title>\n" +
-                "</head>" +
-                "<body>" +
-                "<h1>Mi propio mensaje</h1>" +
-                "</body>" +
-                "</html>";
-        out.println(outputLine);
+         String endpoint = file ;
+            String URL = "http://"+ Host + "/" + query;
+            System.out.println(endpoint);
+            System.out.println(getMethod(endpoint));
+            
+
+            
+            if(getMethod(endpoint) != null){
+                header = fileController.getFile("rta.json");
+                String jsonResponse = getMethod(endpoint).Action(new Peticion(new URL(URL)),new Respuesta());
+                header += "Content-Length: " + jsonResponse.length() + "\r\n";
+                response.add(jsonResponse);
+            } else if (refl.getMethod(endpoint) != null) {
+                Method aMethod = refl.getMethod(endpoint);
+                header = fileController.getFile("rta.json");
+                String jsonResponse = (String) aMethod.invoke(null);
+                header += "Content-Length: " + jsonResponse.length() + "\r\n" + 
+                                        "";
+                response.add(jsonResponse);
+                
+            } else if(file.endsWith(".png")){
+                header += fileController.getFile(file);
+                System.out.println("Funciona" + header);
+                out.println(header);
+                out.println();
+                byte[] data = fileController.getImage(file);
+                out.print(data);
+            }else if(!(file.isEmpty())){
+                header = fileController.getFile(file);
+            }
+            else{
+                System.out.println("val no funciona");
+                //header += fileController.getFile("rta.root");
+                String rootResponse = "<h1>THIS IS A ROOT PAGE OF SERVER</h1>";
+                response.add(rootResponse);
+            }
+            
+            //header
+            if(!(file.endsWith(".jpg"))){
+                out.println(header);
+                //response
+                for(String Answer : response){
+                    System.out.println(Answer);
+                    out.println(Answer);
+                }
+            }
         out.close();
         in.close();
         clientSocket.close();
         serverSocket.close();
     }
+
     /**
      * Allows to split the GET or POST request just to get the query
      * @param text

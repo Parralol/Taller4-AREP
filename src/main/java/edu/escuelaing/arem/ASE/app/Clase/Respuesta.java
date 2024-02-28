@@ -4,7 +4,7 @@ public class Respuesta {
     
     public Respuesta(){}
 
-    public String RespuestaToString(String response){
-        return response;
+    public String RespuestaToString(String  respuesta){
+        return respuesta;
     }
 }
