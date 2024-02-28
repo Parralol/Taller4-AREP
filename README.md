@@ -46,7 +46,11 @@ Por ultimo accedemos a nuestro navegador de confianza con la siguiente URL
 
 ### JS
 
+![image](https://github.com/Parralol/Taller4-AREP/assets/110953563/804ab6b5-22f9-410c-be28-0f1a567ba3c8)
+
 ### CSS
+
+![image](https://github.com/Parralol/Taller4-AREP/assets/110953563/1bef0126-a368-405b-bb50-7967a6c280ba)
 
 
 ## RESPECTO A EL DESARROLLO DE APP POR MEDIO DE ESTE MARCO
