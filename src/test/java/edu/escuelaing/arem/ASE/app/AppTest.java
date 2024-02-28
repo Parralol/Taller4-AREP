@@ -1,39 +1,40 @@
 package edu.escuelaing.arem.ASE.app;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.IOException;
+
+import edu.escuelaing.arem.ASE.app.controllers.FileController;
+import org.junit.Test;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
-{
+public class AppTest{
 
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+    @Test
+    public void testGetFile() throws IOException  {
+        FileController fileController = new FileController();
+        // Assuming "sampleFile.txt" exists for testing
+        String result = fileController.getFile("eba.png");
+        assertNotNull(result);
+        // Add more assertions based on your actual implementation
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    @Test
+    public void testSearchFile() throws IOException {
+        FileController fileController = new FileController();
+        // Assuming "sampleFile.txt" exists for testing
+        String result = fileController.searchFile("sampleFile.txt");
+        assertNotNull(result);
+        // Add more assertions based on your actual implementation
     }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    @Test
+    public void testGetImage() throws IOException {
+        FileController fileController = new FileController();
+        // Assuming "sampleImage.jpg" exists for testing
+        byte[] result = fileController.getImage("eba.png");
+        assertNotNull(result);
+        // Add more assertions based on your actual implementation
     }
 }
