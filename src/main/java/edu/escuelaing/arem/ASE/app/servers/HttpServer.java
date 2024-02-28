@@ -34,14 +34,15 @@ public class HttpServer {
         return instance;
     }
 
-    public HttpServer() throws IOException, IllegalAccessException, InvocationTargetException{
+    public HttpServer() throws IOException, IllegalAccessException, InvocationTargetException, ClassNotFoundException{
         start();
     }
 
-    public void start() throws IOException, IllegalAccessException, InvocationTargetException {
+    public void start() throws IOException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         ServerSocket serverSocket = null;
         FileController fileController = new FileController();
         Reflection refl = new Reflection();
+        refl.getClasses();
 
         try {
             serverSocket = new ServerSocket(35000);
@@ -83,27 +84,28 @@ public class HttpServer {
 
             } else if(inputLine.contains("Host")){
                 Host = inputLine.split(" ")[1];
-                System.out.println(Host);
+                System.out.println(Host );
 
             }
             if (!in.ready()) {
                 break;
             }
         }
-         String endpoint = file ;
+         String endpoint = file + method;
             String URL = "http://"+ Host + "/" + query;
             System.out.println(endpoint);
-            System.out.println(getMethod(endpoint));
+            System.out.println(endpoint);
             
             System.out.println(file + "<---------- FILE");
             if(getMethod(endpoint) != null){
-                header = fileController.getFile("rta.json");
+                header = fileController.getFile("xd.txt");
                 String jsonResponse = getMethod(endpoint).Action(new Peticion(new URL(URL)),new Respuesta());
                 header += "Content-Length: " + jsonResponse.length() + "\r\n";
                 response.add(jsonResponse);
             } else if (refl.getMethod(endpoint) != null) {
+                System.out.print("refl");
                 Method aMethod = refl.getMethod(endpoint);
-                header = fileController.getFile("rta.json");
+                header = fileController.getFile("xd.txt");
                 String jsonResponse = (String) aMethod.invoke(null);
                 header += "Content-Length: " + jsonResponse.length() + "\r\n" + 
                                         "";
@@ -116,16 +118,17 @@ public class HttpServer {
                 out.println();
                 byte[] data = fileController.getImage(file);
                outputStream.write(data);
-            }else if(!(file.isEmpty())){
+            }else if(!(file.isEmpty()) && file.contains(".")){
+                System.out.print("EEERRRROOOOORRR");
                 header = fileController.getFile(file);
                 String xd = fileController.searchFile(file);
                 response.add(header);
                 response.add(xd);
             }
             else{
+                System.out.print("ENTERED");
                 header = fileController.getFile("xd.txt");
                 response.add(header);
-                //header += fileController.getFile("rta.root");
                 String rootResponse = "<h1>ROOT</h1>";
                 response.add(rootResponse);
             }

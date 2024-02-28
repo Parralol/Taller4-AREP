@@ -19,48 +19,17 @@ import edu.escuelaing.arem.ASE.app.POJO.annotations.RequestMapping;
 
 public class Reflection {
     static String ruta = "/HelloController";
-    static Method method = null;
-
     static Map<String, Method> methods = new HashMap<String, Method>();
 
-    public Method getMethod(String name){return methods.get(name);}
+    public  void getClasses() throws ClassNotFoundException {
+
+        String classPath = System.getProperty("java.class.path");
+
+        findControllerClasses(classPath);
 
 
-    public void populateMethods() throws Exception{
-        String path = System.getProperty("java.class.path");
-        File dir = new File(path);
-        if ( !dir.isDirectory() || !dir.exists()) {
-            throw new Exception("algo malo paso...");
-        }
-        String nombre = dir.getName() + ".";
-        search(dir, nombre);
     }
 
-    private void search(File dir, String nombre) throws ClassNotFoundException{
-        File[] archvs = dir.listFiles();
-        for(File a: archvs){
-            if(a.isDirectory()){
-                String pnew = "";
-                if(nombre.contains("classes")){
-                    pnew = a.getName() + ".";
-                }else{
-                    pnew = nombre + a.getName() + ".";
-                }
-                search(dir, pnew);
-            }else if(a.getName().endsWith(".class")){
-                String nombClas = nombre + a.getName().replace(".class","");
-                @SuppressWarnings("rawtypes")
-                Class clase = Class.forName(nombClas);
-                Method[] methodos = clase.getDeclaredMethods();
-                for(Method m : methodos){
-                    if(m.isAnnotationPresent(RequestMapping.class)){
-                        String value = m.getAnnotation(RequestMapping.class).value();
-                        methods.put(value, m);
-                    }
-                }
-            }
-        }
-    }
     public static void mains(String[] args) {
 
         //Suponemos que llega algo por el estilo /sadads
@@ -78,9 +47,11 @@ public class Reflection {
             
             String simulado = "/component/hello";
             String queryValue = "Santiago";
+            Method method = null;
             if (simulado.startsWith("/component")) {
                 Method llamado = methods.get(simulado.substring(10));
                 if (llamado != null) {
+                    
                     if (llamado.getParameterCount() == 1) {
                         String[] margs=new String[]{queryValue};
                         System.out.println("Resultado :" + method.invoke(null, (Object)margs));
@@ -96,4 +67,51 @@ public class Reflection {
             e.printStackTrace();
         }
     }
+    
+    public Method getMethod(String endpoint){
+        return methods.get(endpoint);
+    }
+
+    private  void findControllerClasses(String basePath) throws ClassNotFoundException {
+        File baseDirectory = new File(basePath);
+
+        if (!baseDirectory.exists() || !baseDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Invalid base directory");
+        }
+
+
+
+        searchClasses(baseDirectory, baseDirectory.getName()+ ".");
+
+
+    }
+
+    private  void searchClasses(File directory, String packageName) throws ClassNotFoundException {
+        File[] files = directory.listFiles();
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                String newPackage = null;
+                if((packageName.contains("classes"))){
+                    newPackage = file.getName() + ".";
+                }
+                else{
+                    newPackage = packageName + file.getName() + ".";
+                }
+                searchClasses(file, newPackage);
+            } else if (file.getName().endsWith(".class")) {
+                String className = packageName + file.getName().replace(".class", "");
+                Class<?> aClass = Class.forName(className);
+                Method[] methodss = aClass.getDeclaredMethods();
+                for(Method method : methodss){
+                    if(method.isAnnotationPresent(RequestMapping.class)){
+                        String value = method.getAnnotation(RequestMapping.class).value();
+                        methods.put(value,method);
+
+                    }
+                }
+            }
+        }
+    }
+   
 }

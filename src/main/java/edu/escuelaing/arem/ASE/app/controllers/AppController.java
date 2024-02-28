@@ -6,6 +6,6 @@ public class AppController {
 
     @RequestMapping( value = "POJO")
     public static String index(){
-        return "Ejemplo";
+        return "ROOT";
     }
 }
