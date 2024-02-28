@@ -95,8 +95,7 @@ public class HttpServer {
             System.out.println(endpoint);
             System.out.println(getMethod(endpoint));
             
-
-            
+            System.out.println(file + "<---------- FILE");
             if(getMethod(endpoint) != null){
                 header = fileController.getFile("rta.json");
                 String jsonResponse = getMethod(endpoint).Action(new Peticion(new URL(URL)),new Respuesta());
@@ -111,25 +110,29 @@ public class HttpServer {
                 response.add(jsonResponse);
                 
             } else if(file.endsWith(".png")){
+                System.out.println(file + "<---------- FILE PNG");
                 header += fileController.getFile(file);
-                System.out.println("Funciona" + header);
                 out.println(header);
                 out.println();
                 byte[] data = fileController.getImage(file);
-                out.print(data);
+               outputStream.write(data);
             }else if(!(file.isEmpty())){
                 header = fileController.getFile(file);
+                String xd = fileController.searchFile(file);
+                response.add(header);
+                response.add(xd);
             }
             else{
-                System.out.println("val no funciona");
+                header = fileController.getFile("xd.txt");
+                response.add(header);
                 //header += fileController.getFile("rta.root");
-                String rootResponse = "<h1>THIS IS A ROOT PAGE OF SERVER</h1>";
+                String rootResponse = "<h1>ROOT</h1>";
                 response.add(rootResponse);
             }
             
             //header
             if(!(file.endsWith(".jpg"))){
-                out.println(header);
+                //out.println(header);
                 //response
                 for(String Answer : response){
                     System.out.println(Answer);

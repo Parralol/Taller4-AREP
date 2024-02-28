@@ -51,9 +51,10 @@ public class FileServiceComp implements FileService {
         String path = "src/main/java/static/" + image;
         File arch = new File(path);
         byte[] res = {};
-        if (arch.exists())
+        if (arch.exists()){
+            System.out.println("exists");
             res = Files.readAllBytes(Paths.get(path));
-        else
+        }else
             res = Files.readAllBytes(Paths.get(path + "eba"));
         return res;
     }
