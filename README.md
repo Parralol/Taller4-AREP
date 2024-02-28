@@ -67,4 +67,12 @@ Correr servidor y observar resultados
 
 ![image](https://github.com/Parralol/Taller4-AREP/assets/110953563/8b09de90-b100-4544-baad-489ff777f48d)
 
+## Respecto al testeo
 
+![image](https://github.com/Parralol/Taller4-AREP/assets/110953563/e46fd21a-c31f-4af6-a6ef-560d84d19301)
+
+Se realizan 3 pruebas y pasan con exito.
+
+```
+mvn test-compile
+```
